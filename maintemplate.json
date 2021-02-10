@@ -1,0 +1,39 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {},
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "name": "createStorage",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "relativePath": "linkedtemplates/storage/template.json"
+                },
+                "parameters": {}
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "name": "createWebApp",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'createStorage')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "relativePath": "linkedtemplates/appservice/template.json"
+                },
+                "parameters": {
+                    "storageAccountId": {
+                        "value": "[reference('createStorage').outputs.storageAccountId.value]"
+                    }
+                }
+            }
+        }
+    ]
+}
